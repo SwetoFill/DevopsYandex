@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Тут будет имя нашей машины в заголовке -->
+    <title>{{ inventory_hostname }}</title>
+    <style>
+        /* Базовые стили - делаем страницу поприятнее */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f0f0;
+        }
+        /* Контейнер с тенью - чтобы выглядело как карточка */
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: inline-block;
+        }
+        /* Заголовок делаем синим - так красивее */
+        h1 {
+            color: #0066cc;
+        }
+        /* Блок с информацией - выровнен по левому краю для удобства */
+        .info {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Главное сообщение с именем машины -->
+        <h1>Hello from {{ inventory_hostname }}!</h1>
+        <div class="info">
+            <!-- Выводим разную информацию о сервере - пригодится для отладки -->
+            <p><strong>Hostname:</strong> {{ ansible_hostname }}</p>
+            <p><strong>IP Address:</strong> {{ ansible_host }}</p>
+            <p><strong>Group:</strong> {{ group_names | join(', ') }}</p>
+            <p><strong>Operating System:</strong> {{ ansible_distribution }} {{ ansible_distribution_version }}</p>
+        </div>
+    </div>
+</body>
+</html> 

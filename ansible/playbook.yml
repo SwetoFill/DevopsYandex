@@ -1,0 +1,60 @@
+---
+- name: Поднимаем и настраиваем наши веб-сервера
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Обновляем список пакетов - так надежнее
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Ставим нужный софт - без него никуда
+      apt:
+        name: 
+          - nginx
+          - python3
+          - python3-pip
+        state: present
+
+    - name: Создаем классную приветственную страницу
+      template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: 0644
+      notify: Перезапустим nginx для верности
+
+    - name: Настраиваем nginx на порт 3000 - так просили в задании
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/custom.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Перезапустим nginx для верности
+
+    - name: Активируем нашу конфигурацию
+      file:
+        src: /etc/nginx/sites-available/custom.conf
+        dest: /etc/nginx/sites-enabled/custom.conf
+        state: link
+      notify: Перезапустим nginx для верности
+
+    - name: Убираем дефолтный сайт - он нам не нужен
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Перезапустим nginx для верности
+
+    - name: Запускаем nginx и добавляем в автозагрузку
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Перезапустим nginx для верности
+      service:
+        name: nginx
+        state: restarted 
